@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://sbkwphomc2f5"]
+
+[ext_resource type="Script" uid="uid://dxu6d4svlwpd" path="res://Scripts/HexGrid.gd" id="1_iuamg"]
+
+[node name="Map Scene" type="Node2D"]
+
+[node name="Map" type="Node2D" parent="."]
+script = ExtResource("1_iuamg")
