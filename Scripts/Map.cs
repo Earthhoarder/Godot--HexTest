@@ -5,9 +5,9 @@ using System.Collections.Generic;
 public partial class Map : Node2D
 {
 
-/// <summary>
-/// The types of terrain that a hex map can contain
-/// </summary>
+	/// <summary>
+	/// The types of terrain that a hex map can contain
+	/// </summary>
 	public enum Terrain
 	{
 		Normal,
@@ -21,6 +21,8 @@ public partial class Map : Node2D
 	public class Hex
 	{
 		string id;
+		int row;
+		int col;
 		//A list containing all adjacent hexes
 		List<Hex> listAdjacent;
 		Terrain kindOfTerrain;
@@ -30,6 +32,19 @@ public partial class Map : Node2D
 			get { return ID; }
 			set { id = value; }
 		}
+
+		public int Row
+		{
+			get { return row; }
+			set { row = value; }
+		}
+
+		public int Col
+		{
+			get { return col; }
+			set { col = value; }
+		}
+
 		public List<Hex> ListAdjacent
 		{
 			get { return listAdjacent; }
@@ -43,20 +58,34 @@ public partial class Map : Node2D
 	}
 
 	//Properties
+	double initialOffset = 75.0;
+	double xOffset = 75.0;
+	double yOffset = 75.0;
+
+	
+	Godot.PackedScene hexObject = GD.Load<PackedScene>("res://Objects/defaultSquare.tscn");
 
 	List<List<Hex>> map;
+
+	List<List<Hex>> MAP
+	{
+		get { return map; }
+	}
+
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
 		map = new List<List<Hex>>();
 		GenerateEmptyMap(10, 10);
+		//GD.Print(map[0][4].ID.ToString());
+		LoadMap();
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
-		
+
 	}
 
 	/// <summary>
@@ -72,12 +101,28 @@ public partial class Map : Node2D
 			for (int c = 0; c <= columns; c++)
 			{
 				Hex newHex = new Hex();
-				newHex.ID = r.ToString()+ "." + c.ToString();
+				newHex.ID = r.ToString() + " " + c.ToString();
+				newHex.Row = r;
+				newHex.Col = c;
 				newHex.KindOfTerrain = Terrain.Normal;
 				hexColumn.Add(newHex);
-				GD.Print(newHex);
+				GD.Print(r);
+				GD.Print(c);
+				//GD.Print(newHex.ID);
 			}
 			map.Add(hexColumn);
+		}
+	}
+	public void LoadMap()
+	{
+		for (int r = 0; r <= map.Count; r++)
+		{
+			for (int c = 0; c <= map[0].Count; c++)
+			{
+				Godot.Node2D instance = hexObject.Instantiate();
+				AddChild(instance);
+				instance.GlobalPosition = new Vector2(0, 0);
+			}
 		}
 	}
 }

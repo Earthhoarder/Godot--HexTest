@@ -1,28 +1,16 @@
-[gd_scene load_steps=7 format=3 uid="uid://sbkwphomc2f5"]
+[gd_scene load_steps=4 format=3 uid="uid://sbkwphomc2f5"]
 
 [ext_resource type="Script" uid="uid://cdpolhwcp0aqc" path="res://Scripts/Map.cs" id="1_eobcy"]
 [ext_resource type="Texture2D" uid="uid://eejc5csqjedh" path="res://icon.svg" id="1_iuamg"]
 [ext_resource type="Script" uid="uid://c3pekuif2tsks" path="res://Scripts/Test.cs" id="2_ghdvk"]
-[ext_resource type="Shader" uid="uid://xq1hm7prv5g3" path="res://Shaders/Default.gdshader" id="4_w4tea"]
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_r415i"]
-shader = ExtResource("4_w4tea")
-shader_parameter/color = Color(1, 0, 0, 1)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_eobcy"]
 
 [node name="Map Scene" type="Node2D"]
 
 [node name="Map" type="Node2D" parent="."]
+position = Vector2(444, 125)
 script = ExtResource("1_eobcy")
 
 [node name="Icon" type="Sprite2D" parent="."]
 position = Vector2(71, 67)
 texture = ExtResource("1_iuamg")
 script = ExtResource("2_ghdvk")
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-material = SubResource("ShaderMaterial_r415i")
-position = Vector2(255, 75)
-scale = Vector2(5, 5)
-shape = SubResource("RectangleShape2D_eobcy")
