@@ -63,7 +63,7 @@ public partial class Map : Node2D
 	double yOffset = 75.0;
 
 	
-	Godot.PackedScene hexObject = GD.Load<PackedScene>("res://Objects/defaultSquare.tscn");
+	 Godot.PackedScene hexObject = GD.Load<PackedScene>("res://Objects/defaultSquare.tscn"); 
 
 	List<List<Hex>> map;
 
@@ -106,9 +106,7 @@ public partial class Map : Node2D
 				newHex.Col = c;
 				newHex.KindOfTerrain = Terrain.Normal;
 				hexColumn.Add(newHex);
-				GD.Print(r);
-				GD.Print(c);
-				//GD.Print(newHex.ID);
+				GD.Print(newHex.ID);
 			}
 			map.Add(hexColumn);
 		}
@@ -119,9 +117,9 @@ public partial class Map : Node2D
 		{
 			for (int c = 0; c <= map[0].Count; c++)
 			{
-				Godot.Node2D instance = hexObject.Instantiate();
+				Godot.StaticBody2D instance = (StaticBody2D)hexObject.Instantiate(); 
 				AddChild(instance);
-				instance.GlobalPosition = new Vector2(0, 0);
+				instance.GlobalPosition =  new Vector2(0, 0);
 			}
 		}
 	}
