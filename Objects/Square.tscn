@@ -1,0 +1,18 @@
+[gd_scene load_steps=4 format=3 uid="uid://do8ivunjii5qo"]
+
+[ext_resource type="Script" uid="uid://c080ywrbxciym" path="res://Scripts/Hex.cs" id="1_5ihyh"]
+[ext_resource type="Texture2D" uid="uid://bqq2r8fqvr8ng" path="res://Textures/Default.png" id="2_jhaji"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_8t73x"]
+
+[node name="Node2D" type="Node2D"]
+script = ExtResource("1_5ihyh")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("2_jhaji")
+
+[node name="Area2D" type="Area2D" parent="Sprite2D"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite2D/Area2D"]
+scale = Vector2(3.21, 3.21)
+shape = SubResource("RectangleShape2D_8t73x")

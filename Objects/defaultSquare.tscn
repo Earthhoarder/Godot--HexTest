@@ -1,18 +1,20 @@
 [gd_scene load_steps=4 format=3 uid="uid://cqv35vjx32wrs"]
 
-[ext_resource type="Shader" uid="uid://xq1hm7prv5g3" path="res://Shaders/Default.gdshader" id="1_0d5vu"]
+[ext_resource type="Material" uid="uid://dqns2jg5fatbg" path="res://Materials/Default.tres" id="1_0d5vu"]
+[ext_resource type="Texture2D" uid="uid://eejc5csqjedh" path="res://icon.svg" id="2_5jv0w"]
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_5jv0w"]
-shader = ExtResource("1_0d5vu")
-shader_parameter/color = Color(1, 0, 0, 1)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_bhanq"]
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_bghfx"]
 
 [node name="DefaultSquare" type="Node2D"]
 
 [node name="Area2D" type="Area2D" parent="."]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
-material = SubResource("ShaderMaterial_5jv0w")
 scale = Vector2(5, 5)
-shape = SubResource("RectangleShape2D_bhanq")
+shape = SubResource("RectangleShape2D_bghfx")
+debug_color = Color(0.841254, 0.00111317, 0.920317, 0.42)
+
+[node name="Sprite2D" type="Sprite2D" parent="Area2D/CollisionShape2D"]
+material = ExtResource("1_0d5vu")
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("2_5jv0w")
