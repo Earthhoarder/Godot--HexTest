@@ -31,6 +31,8 @@ public partial class Map : Node2D
 	const float xOffset = (float)74.2;
 	const float yOffset = (float)74.2;
 
+	Vector2 DefaultMapSize = new Vector2(5, 5);
+
 
 	Godot.PackedScene hexObject;
 
@@ -52,7 +54,7 @@ public partial class Map : Node2D
 		updateAdjacent = true;
 		hexObject = GD.Load<PackedScene>("res://Objects/Square.tscn");
 		map = new List<List<Hex>>();
-		GenerateEmptyMap(2, 1);
+		GenerateEmptyMap((int)DefaultMapSize.X, (int)DefaultMapSize.Y);
 		GD.Print(" ");
 		//GD.Print(map[0][4].ID.ToString());
 
@@ -177,33 +179,37 @@ public partial class Map : Node2D
 		Godot.Collections.Array<Node> children = GetChildren();
 		foreach (Node child in children) //gets the SquareHex node
 		{
-
+			//GD.Print(child.Name);
+			List<Hex> adjacent = new List<Hex>();
 			Godot.Collections.Array<Node> subChildren = child.GetChildren();
 			foreach (Node SpriteNode in subChildren) //gets the spriteNodes
 			{
 				Godot.Collections.Array<Node> spriteChildren = SpriteNode.GetChildren();
 				foreach (Node AreaNode in spriteChildren) //gets the Area2D nodes
 				{
-					if (AreaNode.GetName() == "Circle_Around")
+					if (AreaNode.GetName() == "Circle_Around") //make sure we only check for collisions with our hex-specific collider
 					{
-						GD.Print("Good");
 						Godot.Collections.Array<Area2D> overlappingAreas = ((Area2D)AreaNode).GetOverlappingAreas();
-						//GD.Print(((Area2D)AreaNode).HasOverlappingAreas());
-						foreach (Area2D OA in overlappingAreas)
+						foreach (Area2D OA in overlappingAreas.Where(area => area.GetParent() != AreaNode.GetParent())) // for each overlap that isn't this collider's own hex...
 						{
-							if (OA.GetParent() != AreaNode.GetParent()) //prevent detecting own square
-							{
-								//OA.GetParent().GetParent()
-								GD.Print(OA.GetParent().GetParent().Name);
-							}
-							
-
+							adjacent.Add((Hex)((Node2D)OA.GetParent().GetParent()));
 						}
 
 					}
 
 				}
 			}
+			((Hex)child).ListAdjacent = adjacent;
+		}
+		foreach (Node child in children)
+		{
+			string pMessage = "";
+			pMessage += child.Name + " adjacent to hexes:\n";
+			foreach (Hex adjacentHex in ((Hex)child).ListAdjacent)
+			{
+				pMessage += "\t" + adjacentHex.Name + "\n";
+			}
+			GD.Print(pMessage);
 		}
 		GD.Print("UpdateAdjacentHexes End!");
 	}
