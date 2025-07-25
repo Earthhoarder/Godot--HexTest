@@ -1,7 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
-public partial class Hex : Node
+public partial class Hex : Node2D
 {
 	string id;
 	int row;

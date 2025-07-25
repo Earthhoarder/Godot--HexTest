@@ -2,6 +2,8 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+
+
 /// <summary>
 /// The types of terrain that a hex map can contain
 /// </summary>
@@ -14,15 +16,17 @@ public enum Terrain
 
 public partial class Map : Node2D
 {
-	/// <summary>
-	/// 1 Tile on our hex grid
-	/// </summary>
 
+	[Export]
+	public PackedScene SquareScene { get; set; }
 
 	//Properties
-	const float initialOffset = (float)37.5;
-	const float xOffset = (float)75.0;
-	const float yOffset = (float)75.0;
+	//Each imported Square is 64.2 wide
+	//Lets have 10 units of distance between each one vertical and horizontal
+	//64.2 + 10 = 74.2
+	const float initialOffset = (float)32.1;
+	const float xOffset = (float)74.2;
+	const float yOffset = (float)74.2;
 
 
 	Godot.PackedScene hexObject;
@@ -38,13 +42,12 @@ public partial class Map : Node2D
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
+		hexObject = GD.Load<PackedScene>("res://Objects/Square.tscn");
 		map = new List<List<Hex>>();
 		GenerateEmptyMap(10, 10);
 		GD.Print(" ");
 		GD.Print(map[0][4].ID.ToString());
-		GD.Print(map.Count);
-		GD.Print(map[0].Count);
-		hexObject = GD.Load<PackedScene>("res://Objects/Square.tscn");
+		
 		LoadMap();
 	}
 
@@ -73,51 +76,80 @@ public partial class Map : Node2D
 			map.Add(hexColumn);
 		}
 	}
-	public void LoadMap()
+	public async void LoadMap()
 	{
-		Node parent = this.GetParent();
+		GD.Print("LoadMap called");
+		Node parent = GetNode("Map");
+
+		//GD.Print("number of children @ start: " + parent.GetChildCount().ToString());
+		GD.Print("LoadMap called 2");
+
+		//GD.Print(map.Count);
+		//GD.Print(map[0].Count);
+
 		for (int c = 0; c <= map.Count; c++)
 		{
 			for (int r = 0; r <= map[0].Count; r++)
 			{
-				Godot.Area2D instance = (Area2D)hexObject.Instantiate();
-
-				parent.AddChild(instance);
-				//Godot.Node2D instance = new Godot.Node2D();
-				//figure out location of objects:
-				if (c % 2 == 0) //if on odds (first column, third column, etc.)
+				Node2D instance = (Node2D)SquareScene.Instantiate();
+				if (instance is Node2D instance2D)
 				{
-					if (r % 2 == 0) // if on odds (first row, third row, etc.)
+					//GD.Print("Instance Created");
+					AddChild(instance2D);
+
+					//Node2D instance2D = (Node2D)instance;
+					//Godot.Node2D instance = new Godot.Node2D();
+					//figure out location of objects:
+					if (c % 2 == 0) //if on odds (first column, third column, etc.)
 					{
-						float x = xOffset * (float)c;
-						float y = yOffset * (float)r;
-						instance.GlobalPosition = new Vector2(x, y);
+						if (r % 2 == 0) // if on odds (first row, third row, etc.)
+						{
+							float x = xOffset * (float)c;
+							float y = yOffset * (float)r;
+							GD.Print(x.ToString());
+							GD.Print(y.ToString() + "\n");
+							instance.GlobalPosition = new Vector2(x, y);
+						}
+						else //on even rows
+						{
+							float x = xOffset * (float)c + initialOffset;
+							float y = yOffset * (float)r;
+							GD.Print(x.ToString());
+							GD.Print(y.ToString() + "\n");
+							instance.GlobalPosition = new Vector2(x, y);
+						}
+
 					}
-					else //on even rows
+					else //on even columns
 					{
-						float x = xOffset * (float)c + initialOffset;
-						float y = yOffset * (float)r;
-						instance.GlobalPosition = new Vector2(x, y);
+						if (r % 2 == 0) // if on odds (first row, third row, etc.)
+						{
+							float x = xOffset * (float)c;
+							float y = yOffset * (float)r + initialOffset;
+							GD.Print(x.ToString());
+							GD.Print(y.ToString() + "\n");
+							instance.GlobalPosition = new Vector2(x, y);
+						}
+						else // on even rows and even columns
+						{
+							float x = xOffset * (float)c + initialOffset;
+							float y = yOffset * (float)r + initialOffset;
+							GD.Print(x.ToString());
+							GD.Print(y.ToString() + "\n");
+							instance.GlobalPosition = new Vector2(x, y);
+						}
 					}
 
 				}
-				else //on even columns
+				else
 				{
-					if (r % 2 == 0) // if on odds (first row, third row, etc.)
-					{
-						float x = xOffset * (float)c;
-						float y = yOffset * (float)r + initialOffset;
-						instance.GlobalPosition = new Vector2(x, y);
-					}
-					else // on even rows and even columns
-					{
-						float x = xOffset * (float)c + initialOffset;
-						float y = yOffset * (float)r + initialOffset;
-						instance.GlobalPosition = new Vector2(x, y);
-					}
+					GD.Print("Cannot Convert Node to Node2D");
 				}
-
 			}
+
+
 		}
+		GD.Print("number of children @ end: " + GetChildCount().ToString());
+				
 	}
 }
