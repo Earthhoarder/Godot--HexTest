@@ -19,6 +19,12 @@ config/icon="res://icon.svg"
 
 project/assembly_name="Hex Grid"
 
+[layer_names]
+
+2d_physics/layer_1="Squares"
+2d_physics/layer_2="Circles"
+2d_physics/layer_3="Objects on Squares"
+
 [rendering]
 
 renderer/rendering_method="mobile"

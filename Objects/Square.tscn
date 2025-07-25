@@ -1,9 +1,11 @@
-[gd_scene load_steps=4 format=3 uid="uid://do8ivunjii5qo"]
+[gd_scene load_steps=5 format=3 uid="uid://do8ivunjii5qo"]
 
 [ext_resource type="Script" uid="uid://c080ywrbxciym" path="res://Scripts/Hex.cs" id="1_5ihyh"]
 [ext_resource type="Texture2D" uid="uid://bqq2r8fqvr8ng" path="res://Textures/Default.png" id="2_jhaji"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_8t73x"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_5ihyh"]
 
 [node name="Node2D" type="Node2D"]
 script = ExtResource("1_5ihyh")
@@ -12,10 +14,18 @@ script = ExtResource("1_5ihyh")
 position = Vector2(32.1, 32.1)
 texture = ExtResource("2_jhaji")
 
-[node name="Area2D" type="Area2D" parent="Sprite2D"]
+[node name="Square_Interior" type="Area2D" parent="Sprite2D"]
+collision_mask = 5
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite2D/Area2D"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite2D/Square_Interior"]
 scale = Vector2(3.21, 3.21)
 shape = SubResource("RectangleShape2D_8t73x")
 disabled = true
 debug_color = Color(0.840573, 0.0011305, 0.921862, 0.42)
+
+[node name="Circle_Around" type="Area2D" parent="Sprite2D"]
+collision_layer = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite2D/Circle_Around"]
+scale = Vector2(6.465, 6.465)
+shape = SubResource("CircleShape2D_5ihyh")

@@ -44,10 +44,10 @@ public partial class Map : Node2D
 	{
 		hexObject = GD.Load<PackedScene>("res://Objects/Square.tscn");
 		map = new List<List<Hex>>();
-		GenerateEmptyMap(10, 10);
+		GenerateEmptyMap(1, 1);
 		GD.Print(" ");
-		GD.Print(map[0][4].ID.ToString());
-		
+		//GD.Print(map[0][4].ID.ToString());
+
 		LoadMap();
 	}
 
@@ -76,7 +76,7 @@ public partial class Map : Node2D
 			map.Add(hexColumn);
 		}
 	}
-	public async void LoadMap()
+	public void LoadMap()
 	{
 		GD.Print("LoadMap called");
 		Node parent = GetNode("Map");
@@ -87,18 +87,15 @@ public partial class Map : Node2D
 		//GD.Print(map.Count);
 		//GD.Print(map[0].Count);
 
-		for (int c = 0; c <= map.Count; c++)
+		for (int c = 0; c < map.Count; c++)
 		{
-			for (int r = 0; r <= map[0].Count; r++)
+			for (int r = 0; r < map[0].Count; r++)
 			{
 				Node2D instance = (Node2D)SquareScene.Instantiate();
 				if (instance is Node2D instance2D)
 				{
-					//GD.Print("Instance Created");
 					AddChild(instance2D);
 
-					//Node2D instance2D = (Node2D)instance;
-					//Godot.Node2D instance = new Godot.Node2D();
 					//figure out location of objects:
 					if (c % 2 == 0) //if on odds (first column, third column, etc.)
 					{
@@ -112,7 +109,7 @@ public partial class Map : Node2D
 						}
 						else //on even rows
 						{
-							float x = xOffset * (float)c + initialOffset;
+							float x = xOffset * (float)c;
 							float y = yOffset * (float)r;
 							GD.Print(x.ToString());
 							GD.Print(y.ToString() + "\n");
@@ -132,7 +129,7 @@ public partial class Map : Node2D
 						}
 						else // on even rows and even columns
 						{
-							float x = xOffset * (float)c + initialOffset;
+							float x = xOffset * (float)c;
 							float y = yOffset * (float)r + initialOffset;
 							GD.Print(x.ToString());
 							GD.Print(y.ToString() + "\n");
@@ -140,6 +137,7 @@ public partial class Map : Node2D
 						}
 					}
 
+					// Debug: await ToSignal(GetTree().CreateTimer(1.0f), SceneTreeTimer.SignalName.Timeout);
 				}
 				else
 				{
@@ -150,6 +148,20 @@ public partial class Map : Node2D
 
 		}
 		GD.Print("number of children @ end: " + GetChildCount().ToString());
-				
+
+		Godot.Collections.Array<Node> children = GetChildren();
+		//GD.Print(children.name);
+		foreach (Node child in children)
+		{
+			Godot.Collections.Array<Node> subChildren = GetChildren();
+			foreach (Node subChild in subChildren)
+			{
+				GD.Print(subChild.GetName());
+			}
+		}
+		
+
 	}
+	
+	//public void _on_body_
 }
