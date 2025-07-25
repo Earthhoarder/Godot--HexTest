@@ -40,4 +40,5 @@ public partial class Hex : Node2D
 		this.ListAdjacent = list;
 		this.KindOfTerrain = terrain;
 	}
+	
 }

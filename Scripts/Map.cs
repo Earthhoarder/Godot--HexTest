@@ -32,19 +32,13 @@ public partial class Map : Node2D
 	/// <summary>
 	/// travel Weights for the terrain types
 	/// </summary>
-	
+
 
 	[Export]
 	public PackedScene HexScene { get; set; }
 
-	//Properties
-	//Each imported Square is 64.2 wide
-	//Lets have 10 units of distance between each one vertical and horizontal
-	//64.2 + 10 = 74.2
-	const float initialOffset = (float)32.1;
-	const float yOffset = (float)74.2;
 
-	Vector2 DefaultMapSize = new Vector2(7, 7);
+
 
 	List<List<Hex>> map;
 
@@ -64,7 +58,7 @@ public partial class Map : Node2D
 		updateAdjacent = true;
 		map = new List<List<Hex>>();
 
-		LoadEmptyMap((int)DefaultMapSize.X, (int)DefaultMapSize.Y);
+		LoadEmptyMap((int)Constants.DefaultMapSize.X, (int)Constants.DefaultMapSize.Y);
 		//GenerateEmptyMap((int)DefaultMapSize.X, (int)DefaultMapSize.Y);
 		//LoadMap();
 
@@ -211,7 +205,7 @@ public partial class Map : Node2D
 			if (row % 2 == 0) // if on odds (first row, third row, etc.)
 			{
 				float x = Constants.hexXOffset * (float)column;
-				float y = Constants.hexYOffset * (float)row + initialOffset;
+				float y = Constants.hexYOffset * (float)row + Constants.hexInitialOffset;
 				GD.Print(x.ToString());
 				GD.Print(y.ToString() + "\n");
 				return new Vector2(x, y);
@@ -219,7 +213,7 @@ public partial class Map : Node2D
 			else // on even rows and even columns
 			{
 				float x = Constants.hexXOffset * (float)column;
-				float y = Constants.hexYOffset * (float)row + initialOffset;
+				float y = Constants.hexYOffset * (float)row + Constants.hexInitialOffset;
 				GD.Print(x.ToString());
 				GD.Print(y.ToString() + "\n");
 				return new Vector2(x, y);
@@ -295,7 +289,7 @@ public partial class Map : Node2D
 
 			//Show in progress
 			visitedHexes.Add(current.HexReference);
-			ColorHex(current.HexReference);
+			HelperFunctions.ColorHexPath(current.HexReference);
 
 			if (closedList.FirstOrDefault(l => l.ID == Goal.ID) != null)
 			{
@@ -403,17 +397,14 @@ public partial class Map : Node2D
 		GD.Print("GetPathFromIndex End!");
 	}
 
+	//Clears all coloration on the map, resets all hexes to default hex color
 	public void ClearMapColoration()
 	{
 		Godot.Collections.Array<Node> children = GetChildren();
 		foreach (Hex child in children)
 		{
-			child.Modulate = new Color(1, 0, 0);
+			HelperFunctions.ColorHexDefault(child);
 		}
 	}
 
-	public void ColorHex(Hex hex)
-	{
-		hex.Modulate = new Color(0, 0, 1);
-	}
 }
