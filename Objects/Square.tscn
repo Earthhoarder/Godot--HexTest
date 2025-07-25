@@ -7,7 +7,7 @@
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_5ihyh"]
 
-[node name="Node2D" type="Node2D"]
+[node name="SquareHex" type="Node2D"]
 script = ExtResource("1_5ihyh")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
@@ -15,16 +15,16 @@ position = Vector2(32.1, 32.1)
 texture = ExtResource("2_jhaji")
 
 [node name="Square_Interior" type="Area2D" parent="Sprite2D"]
-collision_mask = 5
+collision_mask = 4
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite2D/Square_Interior"]
 scale = Vector2(3.21, 3.21)
 shape = SubResource("RectangleShape2D_8t73x")
-disabled = true
 debug_color = Color(0.840573, 0.0011305, 0.921862, 0.42)
 
 [node name="Circle_Around" type="Area2D" parent="Sprite2D"]
 collision_layer = 2
+input_pickable = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite2D/Circle_Around"]
 scale = Vector2(6.465, 6.465)

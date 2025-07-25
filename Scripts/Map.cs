@@ -1,6 +1,9 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Xml.Serialization;
+using System.Linq;
 
 
 
@@ -38,17 +41,23 @@ public partial class Map : Node2D
 		get { return map; }
 	}
 
+	private bool updateAdjacent;
+	private bool firstFrameIncomplete;
 
+	
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
+		firstFrameIncomplete = true;
+		updateAdjacent = true;
 		hexObject = GD.Load<PackedScene>("res://Objects/Square.tscn");
 		map = new List<List<Hex>>();
-		GenerateEmptyMap(1, 1);
+		GenerateEmptyMap(2, 1);
 		GD.Print(" ");
 		//GD.Print(map[0][4].ID.ToString());
 
 		LoadMap();
+
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -56,6 +65,21 @@ public partial class Map : Node2D
 	{
 
 	}
+
+	public override void _PhysicsProcess(double delta)
+	{
+		base._PhysicsProcess(delta);
+		if (updateAdjacent && firstFrameIncomplete == false)
+		{
+			UpdateAdjacentHexes();
+			updateAdjacent = false;
+		}
+		else if (firstFrameIncomplete)
+		{
+			firstFrameIncomplete = false;
+		}
+    }
+
 
 	/// <summary>
 	/// Generates an empty map, using rows and columns
@@ -78,15 +102,9 @@ public partial class Map : Node2D
 	}
 	public void LoadMap()
 	{
-		GD.Print("LoadMap called");
+		GD.Print("LoadMap called...");
 		Node parent = GetNode("Map");
-
-		//GD.Print("number of children @ start: " + parent.GetChildCount().ToString());
-		GD.Print("LoadMap called 2");
-
-		//GD.Print(map.Count);
-		//GD.Print(map[0].Count);
-
+		GD.Print("number of children @ Start: " + GetChildCount().ToString());
 		for (int c = 0; c < map.Count; c++)
 		{
 			for (int r = 0; r < map[0].Count; r++)
@@ -95,49 +113,8 @@ public partial class Map : Node2D
 				if (instance is Node2D instance2D)
 				{
 					AddChild(instance2D);
-
 					//figure out location of objects:
-					if (c % 2 == 0) //if on odds (first column, third column, etc.)
-					{
-						if (r % 2 == 0) // if on odds (first row, third row, etc.)
-						{
-							float x = xOffset * (float)c;
-							float y = yOffset * (float)r;
-							GD.Print(x.ToString());
-							GD.Print(y.ToString() + "\n");
-							instance.GlobalPosition = new Vector2(x, y);
-						}
-						else //on even rows
-						{
-							float x = xOffset * (float)c;
-							float y = yOffset * (float)r;
-							GD.Print(x.ToString());
-							GD.Print(y.ToString() + "\n");
-							instance.GlobalPosition = new Vector2(x, y);
-						}
-
-					}
-					else //on even columns
-					{
-						if (r % 2 == 0) // if on odds (first row, third row, etc.)
-						{
-							float x = xOffset * (float)c;
-							float y = yOffset * (float)r + initialOffset;
-							GD.Print(x.ToString());
-							GD.Print(y.ToString() + "\n");
-							instance.GlobalPosition = new Vector2(x, y);
-						}
-						else // on even rows and even columns
-						{
-							float x = xOffset * (float)c;
-							float y = yOffset * (float)r + initialOffset;
-							GD.Print(x.ToString());
-							GD.Print(y.ToString() + "\n");
-							instance.GlobalPosition = new Vector2(x, y);
-						}
-					}
-
-					// Debug: await ToSignal(GetTree().CreateTimer(1.0f), SceneTreeTimer.SignalName.Timeout);
+					instance.GlobalPosition = GetPositionOfHex(r, c);
 				}
 				else
 				{
@@ -148,20 +125,88 @@ public partial class Map : Node2D
 
 		}
 		GD.Print("number of children @ end: " + GetChildCount().ToString());
+		GD.Print("LoadMap End!");
+	}
 
+	private Vector2 GetPositionOfHex(int row, int column)
+	{
+		if (column % 2 == 0) //if on odds (first column, third column, etc.)
+					{
+						if (row % 2 == 0) // if on odds (first row, third row, etc.)
+						{
+							float x = xOffset * (float)column;
+							float y = yOffset * (float)row;
+							GD.Print(x.ToString());
+							GD.Print(y.ToString() + "\n");
+							return new Vector2(x, y);
+						}
+						else //on even rows
+						{
+							float x = xOffset * (float)column;
+							float y = yOffset * (float)row;
+							GD.Print(x.ToString());
+							GD.Print(y.ToString() + "\n");
+							return new Vector2(x, y);
+						}
+
+					}
+					else //on even columns
+					{
+						if (row % 2 == 0) // if on odds (first row, third row, etc.)
+						{
+							float x = xOffset * (float)column;
+							float y = yOffset * (float)row + initialOffset;
+							GD.Print(x.ToString());
+							GD.Print(y.ToString() + "\n");
+							return new Vector2(x, y);
+						}
+						else // on even rows and even columns
+						{
+							float x = xOffset * (float)column;
+							float y = yOffset * (float)row + initialOffset;
+							GD.Print(x.ToString());
+							GD.Print(y.ToString() + "\n");
+							return new Vector2(x, y);
+						}
+					}
+	}
+
+	public void UpdateAdjacentHexes()
+	{
+		GD.Print("UpdateAdjacentHexes called...");
 		Godot.Collections.Array<Node> children = GetChildren();
-		//GD.Print(children.name);
-		foreach (Node child in children)
+		foreach (Node child in children) //gets the SquareHex node
 		{
-			Godot.Collections.Array<Node> subChildren = GetChildren();
-			foreach (Node subChild in subChildren)
+
+			Godot.Collections.Array<Node> subChildren = child.GetChildren();
+			foreach (Node SpriteNode in subChildren) //gets the spriteNodes
 			{
-				GD.Print(subChild.GetName());
+				Godot.Collections.Array<Node> spriteChildren = SpriteNode.GetChildren();
+				foreach (Node AreaNode in spriteChildren) //gets the Area2D nodes
+				{
+					if (AreaNode.GetName() == "Circle_Around")
+					{
+						GD.Print("Good");
+						Godot.Collections.Array<Area2D> overlappingAreas = ((Area2D)AreaNode).GetOverlappingAreas();
+						//GD.Print(((Area2D)AreaNode).HasOverlappingAreas());
+						foreach (Area2D OA in overlappingAreas)
+						{
+							if (OA.GetParent() != AreaNode.GetParent()) //prevent detecting own square
+							{
+								//OA.GetParent().GetParent()
+								GD.Print(OA.GetParent().GetParent().Name);
+							}
+							
+
+						}
+
+					}
+
+				}
 			}
 		}
-		
-
+		GD.Print("UpdateAdjacentHexes End!");
 	}
-	
+
 	//public void _on_body_
 }

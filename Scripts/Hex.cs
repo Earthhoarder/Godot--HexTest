@@ -3,11 +3,6 @@ using System;
 using System.Collections.Generic;
 public partial class Hex : Node2D
 {
-	string id;
-	int row;
-	int col;
-	//A list containing all adjacent hexes
-	List<Hex> listAdjacent;
 	Terrain kindOfTerrain;
 	public string ID { get; set; }
 	public int Row { get; set; }
