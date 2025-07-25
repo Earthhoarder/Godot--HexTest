@@ -1,7 +1,8 @@
-[gd_scene load_steps=5 format=3 uid="uid://do8ivunjii5qo"]
+[gd_scene load_steps=6 format=3 uid="uid://do8ivunjii5qo"]
 
 [ext_resource type="Script" uid="uid://c080ywrbxciym" path="res://Scripts/Hex.cs" id="1_5ihyh"]
 [ext_resource type="Texture2D" uid="uid://bqq2r8fqvr8ng" path="res://Textures/Default.png" id="2_jhaji"]
+[ext_resource type="Script" uid="uid://c5v31xc6aixl6" path="res://Scripts/HexInterior.cs" id="3_jhaji"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_8t73x"]
 
@@ -16,6 +17,7 @@ texture = ExtResource("2_jhaji")
 
 [node name="Square_Interior" type="Area2D" parent="Sprite2D"]
 collision_mask = 4
+script = ExtResource("3_jhaji")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite2D/Square_Interior"]
 scale = Vector2(3.21, 3.21)

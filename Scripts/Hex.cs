@@ -6,7 +6,7 @@ public partial class Hex : Node2D
 	public string ID { get; set; }
 	public int Row { get; set; }
 	public int Col { get; set; }
-	public List<Hex> ListAdjacent { get; set; }
+	public List<Hex> ListAdjacent { get; set; } //list of all adjacent hexes
 	public Terrain KindOfTerrain { get; set; }
 	public List<Node2D> ObjectsOnHex { get; set; }
 
@@ -21,7 +21,7 @@ public partial class Hex : Node2D
 		this.ID = newID;
 		this.KindOfTerrain = terrain;
 	}
-	
+
 	//Initialiser with immediately known variables filled
 	public Hex(string newId, int ROW, int COL, Terrain terrain)
 	{

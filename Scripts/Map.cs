@@ -13,16 +13,10 @@ using System.Runtime.CompilerServices;
 /// <summary>
 /// The types of terrain that a hex map can contain
 /// </summary>
-public enum Terrain
-{
-	Normal,
-	Difficult,
-	Paved,
-	Infinite_Distance
-}
 
 public partial class Map : Node2D
 {
+	//data structure for pathfinding of nodes
 	private class Location
 	{
 		public string ID;
@@ -38,23 +32,16 @@ public partial class Map : Node2D
 	/// <summary>
 	/// travel Weights for the terrain types
 	/// </summary>
-	public Dictionary<Terrain, int> TerrainWeight = new Dictionary<Terrain, int>
-	{
-		{Terrain.Normal, 5},
-		{Terrain.Difficult, 10},
-		{Terrain.Paved, 2},
-		{Terrain.Infinite_Distance, int.MaxValue}
-	};
+	
 
 	[Export]
-	public PackedScene SquareScene { get; set; }
+	public PackedScene HexScene { get; set; }
 
 	//Properties
 	//Each imported Square is 64.2 wide
 	//Lets have 10 units of distance between each one vertical and horizontal
 	//64.2 + 10 = 74.2
 	const float initialOffset = (float)32.1;
-	const float xOffset = (float)74.2;
 	const float yOffset = (float)74.2;
 
 	Vector2 DefaultMapSize = new Vector2(7, 7);
@@ -118,7 +105,7 @@ public partial class Map : Node2D
 			List<Hex> hexColumn = new List<Hex>();
 			for (int r = 0; r < rows; r++)
 			{
-				Hex instance = (Hex)SquareScene.Instantiate();
+				Hex instance = (Hex)HexScene.Instantiate();
 				if (instance is Node2D instance2D)
 				{
 					AddChild(instance);
@@ -172,7 +159,7 @@ public partial class Map : Node2D
 		{
 			for (int r = 0; r < map[0].Count; r++)
 			{
-				Node2D instance = (Node2D)SquareScene.Instantiate();
+				Node2D instance = (Node2D)HexScene.Instantiate();
 				if (instance is Node2D instance2D)
 				{
 					AddChild(instance2D);
@@ -203,16 +190,16 @@ public partial class Map : Node2D
 		{
 			if (row % 2 == 0) // if on odds (first row, third row, etc.)
 			{
-				float x = xOffset * (float)column;
-				float y = yOffset * (float)row;
+				float x = Constants.hexXOffset * (float)column;
+				float y = Constants.hexYOffset * (float)row;
 				GD.Print(x.ToString());
 				GD.Print(y.ToString() + "\n");
 				return new Vector2(x, y);
 			}
 			else //on even rows
 			{
-				float x = xOffset * (float)column;
-				float y = yOffset * (float)row;
+				float x = Constants.hexXOffset * (float)column;
+				float y = Constants.hexYOffset * (float)row;
 				GD.Print(x.ToString());
 				GD.Print(y.ToString() + "\n");
 				return new Vector2(x, y);
@@ -223,16 +210,16 @@ public partial class Map : Node2D
 		{
 			if (row % 2 == 0) // if on odds (first row, third row, etc.)
 			{
-				float x = xOffset * (float)column;
-				float y = yOffset * (float)row + initialOffset;
+				float x = Constants.hexXOffset * (float)column;
+				float y = Constants.hexYOffset * (float)row + initialOffset;
 				GD.Print(x.ToString());
 				GD.Print(y.ToString() + "\n");
 				return new Vector2(x, y);
 			}
 			else // on even rows and even columns
 			{
-				float x = xOffset * (float)column;
-				float y = yOffset * (float)row + initialOffset;
+				float x = Constants.hexXOffset * (float)column;
+				float y = Constants.hexYOffset * (float)row + initialOffset;
 				GD.Print(x.ToString());
 				GD.Print(y.ToString() + "\n");
 				return new Vector2(x, y);
@@ -326,7 +313,7 @@ public partial class Map : Node2D
 				if (openList.FirstOrDefault(l => l.ID == adjacentHex.ID) == null)
 				{
 					//Not in open list, do stuff
-					adjacentHex.G = g + TerrainWeight[adjacentHex.HexReference.KindOfTerrain];
+					adjacentHex.G = g + Constants.TerrainWeight[adjacentHex.HexReference.KindOfTerrain];
 					adjacentHex.H = ComputeHScore(adjacentHex.HexReference, Goal);
 					adjacentHex.F = adjacentHex.G + adjacentHex.H;
 					adjacentHex.Parent = current;
@@ -335,7 +322,7 @@ public partial class Map : Node2D
 				}
 				else // it is in the open list
 				{
-					int proposedG = (g + TerrainWeight[adjacentHex.HexReference.KindOfTerrain]);
+					int proposedG = (g + Constants.TerrainWeight[adjacentHex.HexReference.KindOfTerrain]);
 					if (proposedG + adjacentHex.H < adjacentHex.F) //if we can get this hex cheaper than we have recorded
 					{
 						adjacentHex.G = proposedG;
@@ -354,7 +341,7 @@ public partial class Map : Node2D
 		int totalCost = 0;
 		foreach (Hex hex in TraversedPath)
 		{
-			totalCost += TerrainWeight[hex.KindOfTerrain];
+			totalCost += Constants.TerrainWeight[hex.KindOfTerrain];
 		}
 		return totalCost;
 	}
