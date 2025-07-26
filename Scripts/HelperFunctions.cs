@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Reflection.Metadata;
 
 public static class HelperFunctions
 {
@@ -19,14 +20,27 @@ public static class HelperFunctions
         ((Sprite2D)hex.GetChild(0)).Modulate = Constants.DefaultHexColor;
         hex.GetChild<Sprite2D>(0).GetChild<HexInterior>(0).NormalColor = Constants.DefaultHexColor;
     }
-
+    public static void ColorHexByTerrainType(Hex hex)
+    {
+        switch (hex.KindOfTerrain)
+        {
+            case Terrain.Normal:
+                ColorHex(hex, Constants.NormalTerrainHexColor);
+                break;
+            case Terrain.Difficult:
+                ColorHex(hex, Constants.DifficultTerrainHexColor);
+                break;
+            default:
+                ColorHexDefault(hex);
+                break;
+        }
+    }
     // More generic function for coloring a Hex any specific color
     public static void ColorHex(Hex hex, Godot.Color color)
     {
         ((Sprite2D)hex.GetChild(0)).Modulate = color;
         hex.GetChild<Sprite2D>(0).GetChild<HexInterior>(0).NormalColor = color;
     }
-
 
     //Sister functions
     static public void ColorHexNormal(Hex hex)

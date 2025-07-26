@@ -86,9 +86,13 @@ public partial class Map : Node2D
 				firstFrameIncomplete = true;
 			}
 		}
-		if (Input.IsActionJustPressed("Clear Map"))
+		if (Input.IsActionJustPressed("Clean Map"))
 		{
-			ClearMap();
+			CleanMapColoration();
+		}
+		if (Input.IsActionJustPressed("Delete Map"))
+		{
+			DeleteMap();
 		}
 	}
 
@@ -141,7 +145,7 @@ public partial class Map : Node2D
 			}
 			map.Add(hexColumn);
 		}
-		ClearMapColoration();
+		CleanMapColoration();
 	}
 
 	/// <summary>
@@ -289,7 +293,7 @@ public partial class Map : Node2D
 		GD.Print("UpdateAdjacentHexes End!");
 	}
 
-	public List<Hex> FindPathFromAToB(Hex Start, Hex Goal) //A* algorithm basically
+	public List<Hex> FindPathFromAToB(Hex Start, Hex Goal) //A* algorithm basically, from https://gigi.nullneuron.net/gigilabs/a-pathfinding-example-in-c/
 	{
 		GD.Print("FindPathFromAToB called...");
 		Location current = null;
@@ -370,7 +374,7 @@ public partial class Map : Node2D
 		return totalCost;
 	}
 
-	static float ComputeHScore(Hex current, Hex goal)
+	static float ComputeHScore(Hex current, Hex goal) //https://gigi.nullneuron.net/gigilabs/a-pathfinding-example-in-c/
 	{
 		return MathF.Abs(goal.Position.X - current.Position.X) + Mathf.Abs(goal.Position.Y - current.Position.Y);
 		//return Mathf.Abs(goal.Row - current.Row) + Mathf.Abs(goal.Col - current.Col);
@@ -431,12 +435,12 @@ public partial class Map : Node2D
 	}
 
 	//Clears all coloration on the map, resets all hexes to default hex color
-	public void ClearMapColoration()
+	public void CleanMapColoration()
 	{
 		Godot.Collections.Array<Node> children = GetChildren();
 		foreach (Hex child in children)
 		{
-			HelperFunctions.ColorHexDefault(child);
+			HelperFunctions.ColorHexByTerrainType(child);
 		}
 	}
 
@@ -454,7 +458,7 @@ public partial class Map : Node2D
 		else //exactly two 
 		{
 			var StartAndEnd = ReturnHexesAndClearSelected();
-			ClearMapColoration();
+			CleanMapColoration();
 			var traversedPath = FindPathFromAToB(StartAndEnd[0], StartAndEnd[1]);
 			GD.Print("Path from index: (" + StartAndEnd[0].Row.ToString() + "," + StartAndEnd[0].Col.ToString() + ") TO index: (" + StartAndEnd[1].Row.ToString() + "," + StartAndEnd[1].Col.ToString() + ") is:");
 			foreach (var hex in traversedPath)
@@ -492,7 +496,7 @@ public partial class Map : Node2D
 		SelectedHexes.Clear();
 	}
 
-	public void ClearMap()
+	public void DeleteMap()
 	{
 		ClearSelected();
 		foreach (List<Hex> hexColumn in map)
