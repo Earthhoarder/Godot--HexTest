@@ -1,0 +1,29 @@
+[gd_scene load_steps=5 format=3 uid="uid://dqnvtdw4ave8q"]
+
+[ext_resource type="Texture2D" uid="uid://43kiqmpltomd" path="res://Textures/hex_128.png" id="1_08wmp"]
+[ext_resource type="Script" uid="uid://c080ywrbxciym" path="res://Scripts/Hex.cs" id="1_nauub"]
+[ext_resource type="Script" uid="uid://c5v31xc6aixl6" path="res://Scripts/HexInterior.cs" id="2_nauub"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_32ijh"]
+
+[node name="Hex" type="Node2D"]
+script = ExtResource("1_nauub")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(64, 64)
+texture = ExtResource("1_08wmp")
+
+[node name="Hex_Interior" type="Area2D" parent="Sprite2D"]
+collision_mask = 4
+script = ExtResource("2_nauub")
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Sprite2D/Hex_Interior"]
+polygon = PackedVector2Array(32, -64, 64, 0, 32, 64, -32, 64, -64, 0, -32, -64)
+
+[node name="Circle_Around" type="Area2D" parent="Sprite2D"]
+collision_layer = 2
+input_pickable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite2D/Circle_Around"]
+scale = Vector2(7.6, 7.6)
+shape = SubResource("CircleShape2D_32ijh")

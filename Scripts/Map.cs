@@ -11,9 +11,8 @@ using System.Runtime.CompilerServices;
 
 
 /// <summary>
-/// The types of terrain that a hex map can contain
+/// Larger data structure containing many hexes that make up a map
 /// </summary>
-
 public partial class Map : Node2D
 {
 	//data structure for pathfinding of nodes
@@ -22,9 +21,9 @@ public partial class Map : Node2D
 		public string ID;
 		public int x;
 		public int y;
-		public int F;
+		public float F;
 		public int G;
-		public int H;
+		public float H;
 		public Location Parent;
 		public Hex HexReference;
 	}
@@ -38,11 +37,11 @@ public partial class Map : Node2D
 	public PackedScene HexScene { get; set; }
 
 
-
+	public List<Hex> SelectedHexes { get; set; }
 
 	List<List<Hex>> map;
 
-	List<List<Hex>> MAP
+	public List<List<Hex>> MAP
 	{
 		get { return map; }
 	}
@@ -54,9 +53,12 @@ public partial class Map : Node2D
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
-		firstFrameIncomplete = true;
-		updateAdjacent = true;
+		//Set default values for the class
+
+		SelectedHexes = new List<Hex>();
 		map = new List<List<Hex>>();
+		updateAdjacent = true;
+		firstFrameIncomplete = true;
 
 		LoadEmptyMap((int)Constants.DefaultMapSize.X, (int)Constants.DefaultMapSize.Y);
 		//GenerateEmptyMap((int)DefaultMapSize.X, (int)DefaultMapSize.Y);
@@ -67,7 +69,27 @@ public partial class Map : Node2D
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
-
+		if (Input.IsActionJustPressed("Pathfind"))
+		{
+			PathfindFromSelectedHexes();
+		}
+		if (Input.IsActionJustPressed("Load Empty Map"))
+		{
+			if (map.Count > 0)
+			{
+				GD.Print("Cannot Instantiate a new Map, old one exists. Please clear the old map before continuing");
+			}
+			else
+			{
+				LoadEmptyMap((int)Constants.DefaultMapSize.X, (int)Constants.DefaultMapSize.Y);
+				updateAdjacent = true;
+				firstFrameIncomplete = true;
+			}
+		}
+		if (Input.IsActionJustPressed("Clear Map"))
+		{
+			ClearMap();
+		}
 	}
 
 	public override void _PhysicsProcess(double delta)
@@ -77,8 +99,6 @@ public partial class Map : Node2D
 		{
 			UpdateAdjacentHexes();
 			updateAdjacent = false;
-			GD.Print("stom");
-			GetPathFromIndex(0, 0, 4, 5);
 		}
 		else if (firstFrameIncomplete)
 		{
@@ -93,6 +113,7 @@ public partial class Map : Node2D
 	/// <param name="rows"></param>
 	public void LoadEmptyMap(int columns, int rows)
 	{
+		ClearSelected();
 		map.Clear();
 		for (int c = 0; c < columns; c++)
 		{
@@ -205,7 +226,7 @@ public partial class Map : Node2D
 			if (row % 2 == 0) // if on odds (first row, third row, etc.)
 			{
 				float x = Constants.hexXOffset * (float)column;
-				float y = Constants.hexYOffset * (float)row + Constants.hexInitialOffset;
+				float y = Constants.hexYOffset * (float)row + Constants.hexInitialYOffset;
 				GD.Print(x.ToString());
 				GD.Print(y.ToString() + "\n");
 				return new Vector2(x, y);
@@ -213,7 +234,7 @@ public partial class Map : Node2D
 			else // on even rows and even columns
 			{
 				float x = Constants.hexXOffset * (float)column;
-				float y = Constants.hexYOffset * (float)row + Constants.hexInitialOffset;
+				float y = Constants.hexYOffset * (float)row + Constants.hexInitialYOffset;
 				GD.Print(x.ToString());
 				GD.Print(y.ToString() + "\n");
 				return new Vector2(x, y);
@@ -279,6 +300,9 @@ public partial class Map : Node2D
 
 		List<Hex> visitedHexes = new List<Hex>();
 
+		HelperFunctions.ColorHex(Start, Constants.StartingHexColor);
+
+		GD.Print("good");
 		while (openList.Count > 0)
 		{
 			var lowest = openList.Min(l => l.F);
@@ -289,11 +313,17 @@ public partial class Map : Node2D
 
 			//Show in progress
 			visitedHexes.Add(current.HexReference);
-			HelperFunctions.ColorHexPath(current.HexReference);
+			if (current.HexReference != Start)
+			{
+				HelperFunctions.ColorHexPath(current.HexReference);
+			}
 
+			//Continue with the search
 			if (closedList.FirstOrDefault(l => l.ID == Goal.ID) != null)
 			{
+				HelperFunctions.ColorHex(closedList.FirstOrDefault(l => l.ID == Goal.ID).HexReference, Constants.EndingHexColor);
 				break; //found our goal location
+
 			}
 
 			List<Location> adjacentHexes = GetAdjacentHexesAsLocations(current);
@@ -340,9 +370,12 @@ public partial class Map : Node2D
 		return totalCost;
 	}
 
-	static int ComputeHScore(Hex current, Hex goal)
+	static float ComputeHScore(Hex current, Hex goal)
 	{
-		return Mathf.Abs(goal.Row - current.Row) + Mathf.Abs(goal.Col - current.Col);
+		return MathF.Abs(goal.Position.X - current.Position.X) + Mathf.Abs(goal.Position.Y - current.Position.Y);
+		//return Mathf.Abs(goal.Row - current.Row) + Mathf.Abs(goal.Col - current.Col);
+		//Turn into actual position
+
 	}
 
 	static Location ConvertHexToLocation(Hex hex)
@@ -405,6 +438,72 @@ public partial class Map : Node2D
 		{
 			HelperFunctions.ColorHexDefault(child);
 		}
+	}
+
+	public void PathfindFromSelectedHexes()
+	{
+		if (SelectedHexes.Count < 2)
+		{
+			GD.Print("Not enough hexes selected(" + SelectedHexes.Count + ") to pathfind...");
+
+		}
+		else if (SelectedHexes.Count > 2)
+		{
+			GD.Print("Too many hexes selected(" + SelectedHexes.Count + ") to pathfind...");
+		}
+		else //exactly two 
+		{
+			var StartAndEnd = ReturnHexesAndClearSelected();
+			ClearMapColoration();
+			var traversedPath = FindPathFromAToB(StartAndEnd[0], StartAndEnd[1]);
+			GD.Print("Path from index: (" + StartAndEnd[0].Row.ToString() + "," + StartAndEnd[0].Col.ToString() + ") TO index: (" + StartAndEnd[1].Row.ToString() + "," + StartAndEnd[1].Col.ToString() + ") is:");
+			foreach (var hex in traversedPath)
+			{
+				//GD.Print("\t" + hex.ID);
+				GD.Print("\t" + hex.Row + "," + hex.Col);
+			}
+			GD.Print("GetPathFromIndex End!");
+		}
+	}
+
+	/// <summary>
+	/// Gets the references in SelectedHexes and returns them, while removing dependencies in said hexes for selection purposes
+	/// </summary>
+	/// <returns>List<Hex> of the hexes in SelectedHexes </returns>
+	public List<Hex> ReturnHexesAndClearSelected()
+	{
+		List<Hex> returnedList = new List<Hex>();
+		foreach (Hex hex in SelectedHexes)
+		{
+			hex.GetChild<Sprite2D>(0).GetChild<HexInterior>(0).HexSelected = false;
+			returnedList.Add(hex);
+		}
+		SelectedHexes.Clear();
+		return returnedList;
+	}
+
+	//Clears SelectedHexes, including HexInterior script dependencies
+	public void ClearSelected()
+	{
+		foreach (Hex hex in SelectedHexes)
+		{
+			hex.GetChild<Sprite2D>(0).GetChild<HexInterior>(0).HexSelected = false;
+		}
+		SelectedHexes.Clear();
+	}
+
+	public void ClearMap()
+	{
+		ClearSelected();
+		foreach (List<Hex> hexColumn in map)
+		{
+			foreach (Hex hex in hexColumn)
+			{
+
+				hex.QueueFree();
+			}
+		}
+		map.Clear();
 	}
 
 }

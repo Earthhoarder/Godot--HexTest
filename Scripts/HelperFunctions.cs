@@ -20,6 +20,15 @@ public static class HelperFunctions
         hex.GetChild<Sprite2D>(0).GetChild<HexInterior>(0).NormalColor = Constants.DefaultHexColor;
     }
 
+    // More generic function for coloring a Hex any specific color
+    public static void ColorHex(Hex hex, Godot.Color color)
+    {
+        ((Sprite2D)hex.GetChild(0)).Modulate = color;
+        hex.GetChild<Sprite2D>(0).GetChild<HexInterior>(0).NormalColor = color;
+    }
+
+
+    //Sister functions
     static public void ColorHexNormal(Hex hex)
     {
         ((Sprite2D)hex.GetChild(0)).Modulate = hex.GetChild<Sprite2D>(0).GetChild<HexInterior>(0).NormalColor;
@@ -30,11 +39,7 @@ public static class HelperFunctions
         ((Sprite2D)hex.GetChild(0)).Modulate = Constants.SelectedHexColor;
     }
 
-    public static void ColorHex(Hex hex, Color color)
-    {
-        ((Sprite2D)hex.GetChild(0)).Modulate = color;
-        hex.GetChild<Sprite2D>(0).GetChild<HexInterior>(0).NormalColor = color;
-    }
+    
     
     #endregion
 }

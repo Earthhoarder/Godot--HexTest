@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://cdpolhwcp0aqc" path="res://Scripts/Map.cs" id="1_eobcy"]
 [ext_resource type="Texture2D" uid="uid://eejc5csqjedh" path="res://icon.svg" id="1_iuamg"]
 [ext_resource type="Script" uid="uid://c3pekuif2tsks" path="res://Scripts/Test.cs" id="2_ghdvk"]
-[ext_resource type="PackedScene" uid="uid://do8ivunjii5qo" path="res://Objects/Square.tscn" id="2_w4tea"]
+[ext_resource type="PackedScene" uid="uid://dqnvtdw4ave8q" path="res://Objects/Hex.tscn" id="2_w4tea"]
 
 [node name="Map Scene" type="Node2D"]
 

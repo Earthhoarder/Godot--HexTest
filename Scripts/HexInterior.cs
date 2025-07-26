@@ -2,6 +2,9 @@ using Godot;
 using Godot.NativeInterop;
 using System;
 
+/// <summary>
+/// The class for determining what exists inside a hex, and individual processes associated with a hex
+/// </summary>
 public partial class HexInterior : Area2D
 {
 	// Called when the node enters the scene tree for the first time.
@@ -11,13 +14,17 @@ public partial class HexInterior : Area2D
 
 	private bool MouseInside = false;
 
-	private bool HexSelected = false;
+	public bool HexSelected = false;
+
+	Hex hexParent;
 
 	public override void _Ready()
 	{
 		//Connect our collision functions to collision events:
 		this.Connect("mouse_entered", new Callable(this, MethodName.OnMouseEnter));
 		this.Connect("mouse_exited", new Callable(this, MethodName.OnMouseExit));
+		//set default values on scene instantiation
+		hexParent = this.GetParent<Sprite2D>().GetParent<Hex>();
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -27,14 +34,16 @@ public partial class HexInterior : Area2D
 		{
 			GD.Print("Hex has been selected");
 			HexSelected = true;
-			HelperFunctions.ColorHexSelected(this.GetParent<Sprite2D>().GetParent<Hex>());
+			HelperFunctions.ColorHexSelected(hexParent);
+			hexParent.GetParent<Map>().SelectedHexes.Add(hexParent); //adds the larger hex to the selected hex list in the Map
 
 		}
 		else if (Input.IsActionJustPressed("Unselect Hex") && MouseInside)
 		{
 			GD.Print("Hex has been unselected");
 			HexSelected = false;
-			HelperFunctions.ColorHexNormal(this.GetParent<Sprite2D>().GetParent<Hex>());
+			HelperFunctions.ColorHexNormal(hexParent);
+			hexParent.GetParent<Map>().SelectedHexes.Remove(hexParent);
 		}
 	}
 
@@ -61,5 +70,5 @@ public partial class HexInterior : Area2D
 		MouseInside = false;
 	}
 
-	
+
 }
